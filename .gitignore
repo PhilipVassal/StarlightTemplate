@@ -1,0 +1,25 @@
+# --- OS / Editor / IDE ---
+.DS_Store
+.vscode/
+
+# --- direnv / environment ---
+.direnv
+.env
+
+# --- Dependencies ---
+node_modules/
+
+# --- Build output / caches ---
+dist/
+.cache/
+.astro/
+
+# --- Logs ---
+*.log
+
+# --- Editor tmp ---
+*.swp
+*.swo
+*~
+*.bak
+*.orig
