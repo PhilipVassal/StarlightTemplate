@@ -1,0 +1,37 @@
+---
+/** Interactive 3D view of Philip Vassal's brake disc design. */
+---
+
+<script is:inline src="/model-viewer.min.js"></script>
+
+<model-viewer
+  src="/bremseskive.glb?v=4"
+  alt="Interaktiv 3D-modell av bremseskiven Philip Vassal designet for Helix NMBU"
+  camera-controls
+  camera-orbit="45deg 65deg 105%"
+  auto-rotate
+  shadow-intensity="1"
+  exposure="1.15"
+  environment-image="neutral"
+  interaction-prompt="auto"
+></model-viewer>
+
+<p class="hint">Dra for å rotere modellen og bruk musehjulet for å zoome.</p>
+
+<style>
+  model-viewer {
+    width: 100%;
+    height: min(32rem, 65vw);
+    min-height: 22rem;
+    margin-block: 1.25rem 0.5rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.75rem;
+    background: radial-gradient(circle at 50% 40%, #344150 0%, #19212a 65%);
+  }
+
+  .hint {
+    margin-top: 0;
+    color: var(--sl-color-gray-3);
+    font-size: 0.9rem;
+  }
+</style>

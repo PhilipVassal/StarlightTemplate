@@ -1,6 +1,6 @@
 {
-  "name": "<WORKER_NAME>",
-  "compatibility_date": "<COMPATIBILITY_DATE>",
+  "name": "philip-portfolio",
+  "compatibility_date": "2025-09-13",
   "compatibility_flags": [
     "nodejs_compat"
   ],

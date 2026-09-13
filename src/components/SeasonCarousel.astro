@@ -1,0 +1,77 @@
+---
+/** Photos from building and testing the Helix car before the 2026 competitions. */
+import season02 from '../assets/sesong-2026/sesong-02.jpg';
+import season03 from '../assets/sesong-2026/sesong-03.jpg';
+import season04 from '../assets/sesong-2026/sesong-04.jpg';
+import season05 from '../assets/sesong-2026/sesong-05.jpg';
+import season06 from '../assets/sesong-2026/sesong-06.jpg';
+import season07 from '../assets/sesong-2026/sesong-07.jpg';
+import season08 from '../assets/sesong-2026/sesong-08.jpg';
+
+interface Props {
+  locale?: 'nb' | 'en';
+}
+
+const { locale = 'nb' } = Astro.props;
+const copy = locale === 'en'
+  ? { previous: 'Previous image', next: 'Next image', image: 'Image', of: 'of', alt: 'Photos from building before the 2026 competitions' }
+  : { previous: 'Forrige bilde', next: 'Neste bilde', image: 'Bilde', of: 'av', alt: 'Bilder fra bygging før konkurransene i 2026' };
+const sources = [season05, season03, season04, season02, season06, season07, season08];
+const images = sources.map((source, index) => ({
+  src: source.src,
+  alt: `${copy.alt} – ${copy.image.toLowerCase()} ${index + 1}`,
+}));
+---
+
+<section class="carousel" aria-label={copy.alt} data-season-carousel>
+  <div class="frame">
+    {images.map((image, index) => (
+      <img src={image.src} alt={image.alt} class:list={{ slide: true, active: index === 0 }} loading={index === 0 ? 'eager' : 'lazy'} decoding="async" data-slide />
+    ))}
+  </div>
+  <div class="controls">
+    <button type="button" aria-label={copy.previous} data-previous>←</button>
+    <p aria-live="polite" data-status data-label={copy.image} data-of={copy.of}>{copy.image} 1 {copy.of} {images.length}</p>
+    <button type="button" aria-label={copy.next} data-next>→</button>
+  </div>
+  <div class="dots" aria-label={copy.alt}>
+    {images.map((_, index) => <button type="button" class:list={{ dot: true, active: index === 0 }} aria-label={`${copy.image} ${index + 1}`} aria-current={index === 0 ? 'true' : undefined} data-dot={index} />)}
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-season-carousel]').forEach((carousel) => {
+    const slides = Array.from(carousel.querySelectorAll<HTMLElement>('[data-slide]'));
+    const dots = Array.from(carousel.querySelectorAll<HTMLButtonElement>('[data-dot]'));
+    const status = carousel.querySelector<HTMLElement>('[data-status]');
+    let current = 0;
+    const show = (index: number) => {
+      current = (index + slides.length) % slides.length;
+      slides.forEach((slide, i) => slide.classList.toggle('active', i === current));
+      dots.forEach((dot, i) => {
+        const active = i === current;
+        dot.classList.toggle('active', active);
+        dot.setAttribute('aria-current', active ? 'true' : 'false');
+      });
+      if (status) status.textContent = `${status.dataset.label} ${current + 1} ${status.dataset.of} ${slides.length}`;
+    };
+    carousel.querySelector('[data-previous]')?.addEventListener('click', () => show(current - 1));
+    carousel.querySelector('[data-next]')?.addEventListener('click', () => show(current + 1));
+    dots.forEach((dot, index) => dot.addEventListener('click', () => show(index)));
+  });
+</script>
+
+<style>
+  .carousel { margin-block: 1.25rem; }
+  .frame { position: relative; overflow: hidden; aspect-ratio: 16 / 10; border: 1px solid var(--sl-color-gray-5); border-radius: 0.75rem; background: var(--sl-color-black); }
+  .slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 220ms ease; }
+  .slide.active { opacity: 1; }
+  .controls, .dots { display: flex; align-items: center; justify-content: center; gap: 0.75rem; }
+  .controls { margin-top: 0.75rem; }
+  .controls p { min-width: 6rem; margin: 0; color: var(--sl-color-gray-3); text-align: center; font-size: 0.9rem; }
+  .controls button, .dot { border: 1px solid var(--sl-color-gray-5); background: var(--sl-color-gray-6); color: var(--sl-color-white); cursor: pointer; }
+  .controls button { width: 2.25rem; height: 2.25rem; border-radius: 999px; font-size: 1.2rem; }
+  .dots { margin-top: 0.75rem; }
+  .dot { width: 0.6rem; height: 0.6rem; padding: 0; border-radius: 999px; }
+  .controls button:hover, .controls button:focus-visible, .dot.active, .dot:focus-visible { border-color: var(--sl-color-accent-high); background: var(--sl-color-accent-high); }
+</style>

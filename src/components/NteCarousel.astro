@@ -1,0 +1,39 @@
+---
+/** Placeholder for photos from Nordic Test Event 2026 until the photos are added. */
+interface Props {
+  locale?: 'nb' | 'en';
+}
+
+const { locale = 'nb' } = Astro.props;
+const text = locale === 'en'
+  ? 'Photos from Nordic Test Event 2026 will appear here.'
+  : 'Bilder fra Nordic Test Event 2026 kommer her.';
+---
+
+<div class="nte-carousel" aria-label={text}>
+  <span aria-hidden="true">📷</span>
+  <p>{text}</p>
+</div>
+
+<style>
+  .nte-carousel {
+    display: grid;
+    min-height: 15rem;
+    place-content: center;
+    gap: 0.75rem;
+    margin-block: 1.25rem;
+    border: 1px dashed var(--sl-color-gray-5);
+    border-radius: 0.75rem;
+    background: linear-gradient(135deg, var(--sl-color-gray-6), transparent);
+    color: var(--sl-color-gray-3);
+    text-align: center;
+  }
+
+  span {
+    font-size: 2rem;
+  }
+
+  p {
+    margin: 0;
+  }
+</style>

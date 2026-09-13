@@ -1,0 +1,50 @@
+---
+/** Interactive 3D view of the complete Helix Formula Student car. */
+interface Props {
+  locale?: 'nb' | 'en';
+}
+
+const { locale = 'nb' } = Astro.props;
+const text = locale === 'en'
+  ? {
+      alt: 'Interactive 3D model of Casino, Helix Formula Student car for the 2026 season',
+      hint: 'Drag to rotate Casino and use the mouse wheel to zoom.',
+    }
+  : {
+      alt: 'Interaktiv 3D-modell av Casino, Helix Formula Student-bilen for 2026-sesongen',
+      hint: 'Dra for å rotere Casino og bruk musehjulet for å zoome.',
+    };
+---
+
+<script is:inline src="/model-viewer.min.js"></script>
+
+<model-viewer
+  src="/helix-car.glb"
+  alt={text.alt}
+  camera-controls
+  auto-rotate
+  shadow-intensity="1"
+  exposure="1.1"
+  environment-image="neutral"
+  interaction-prompt="auto"
+></model-viewer>
+
+<p>{text.hint}</p>
+
+<style>
+  model-viewer {
+    width: 100%;
+    height: min(34rem, 70vw);
+    min-height: 22rem;
+    margin-block: 1.25rem 0.5rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.75rem;
+    background: radial-gradient(circle at 50% 40%, #344150 0%, #19212a 65%);
+  }
+
+  p {
+    margin-top: 0;
+    color: var(--sl-color-gray-3);
+    font-size: 0.9rem;
+  }
+</style>

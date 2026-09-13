@@ -1,40 +1,27 @@
 ---
-title: Welcome to Starlight
-description: Get started building your docs site with Starlight.
-template: splash # Remove or comment out this line to display the site sidebar on this page.
-hero:
-  tagline: Congrats on setting up a new Starlight project!
-  image:
-    file: ../../assets/houston.webp
-  actions:
-    - text: Example Guide
-      link: /guides/example/
-      icon: right-arrow
-    - text: Read the Starlight docs
-      link: https://starlight.astro.build
-      icon: external
-      variant: minimal
+title: Philip Vassal
+description: Philip Vassals prosjektportefølje med Patronus og Helix NMBU.
+template: splash
+prev: false
+next: false
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+<div class="portfolio-home">
+  <header class="portfolio-intro">
+    <h1>Philip Vassal</h1>
+    <p>Prosjektportefølje</p>
+  </header>
 
-## Next steps
+  <img class="portfolio-portrait" src="/philip-vassal.jpg" alt="Portrett av Philip Vassal i Helix NMBU-skjorte" />
 
-<CardGrid stagger>
-	<Card title="Update content" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</Card>
-	<Card title="Change page layout" icon="document">
-		Delete `template: splash` in `src/content/docs/index.mdx` to display a
-		sidebar on this page.
-	</Card>
-	<Card title="Add new content" icon="add-document">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
-	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
-	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
-	</Card>
-</CardGrid>
+  <nav class="portfolio-links" aria-label="Hovedlenker">
+    <p>LENKER</p>
+    <a href="/prosjekter/prosjekt-01/">Patronus <span aria-hidden="true">→</span></a>
+    <a href="/prosjekter/prosjekt-02/">Helix NMBU <span aria-hidden="true">→</span></a>
+    <a href="/om-meg/">Om meg og CV <span aria-hidden="true">→</span></a>
+  </nav>
+
+  <p class="portfolio-summary">Her viser jeg arbeid med mekanisk design, 3D-modellering og Formula Student.</p>
+
+  <footer class="portfolio-footer">© 2026 Philip Vassal</footer>
+</div>

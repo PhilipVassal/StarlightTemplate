@@ -1,0 +1,171 @@
+---
+/** A keyboard-accessible image carousel for the Formula Future trip to Meppen. */
+interface Props {
+  locale?: 'nb' | 'en';
+}
+
+const { locale = 'nb' } = Astro.props;
+const copy = locale === 'en'
+  ? {
+      previous: 'Previous image',
+      next: 'Next image',
+      label: 'Image',
+      of: 'of',
+      alt: 'Photo from Formula Future in Meppen, 2026',
+    }
+  : {
+      previous: 'Forrige bilde',
+      next: 'Neste bilde',
+      label: 'Bilde',
+      of: 'av',
+      alt: 'Bilde fra Formula Future i Meppen, 2026',
+    };
+
+const images = Array.from({ length: 7 }, (_, index) => ({
+  src: `/meppen-2026/meppen-${String(index + 1).padStart(2, '0')}.jpg`,
+  alt: `${copy.alt} – ${copy.label.toLowerCase()} ${index + 1}`,
+}));
+---
+
+<section class="carousel" aria-label={copy.alt} data-carousel>
+  <div class="frame">
+    {images.map((image, index) => (
+      <img
+        src={image.src}
+        alt={image.alt}
+        class:list={{ slide: true, active: index === 0 }}
+        loading={index === 0 ? 'eager' : 'lazy'}
+        decoding="async"
+        data-slide
+      />
+    ))}
+  </div>
+  <div class="controls">
+    <button type="button" class="arrow" aria-label={copy.previous} data-previous>←</button>
+    <p aria-live="polite" data-status>{copy.label} 1 {copy.of} {images.length}</p>
+    <button type="button" class="arrow" aria-label={copy.next} data-next>→</button>
+  </div>
+  <div class="dots" aria-label={copy.alt}>
+    {images.map((image, index) => (
+      <button
+        type="button"
+        class:list={{ dot: true, active: index === 0 }}
+        aria-label={`${copy.label} ${index + 1}`}
+        aria-current={index === 0 ? 'true' : undefined}
+        data-dot={index}
+      />
+    ))}
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((carousel) => {
+    const slides = Array.from(carousel.querySelectorAll<HTMLElement>('[data-slide]'));
+    const dots = Array.from(carousel.querySelectorAll<HTMLButtonElement>('[data-dot]'));
+    const status = carousel.querySelector<HTMLElement>('[data-status]');
+    const previous = carousel.querySelector<HTMLButtonElement>('[data-previous]');
+    const next = carousel.querySelector<HTMLButtonElement>('[data-next]');
+    let current = 0;
+
+    const show = (index: number) => {
+      current = (index + slides.length) % slides.length;
+      slides.forEach((slide, slideIndex) => slide.classList.toggle('active', slideIndex === current));
+      dots.forEach((dot, dotIndex) => {
+        const active = dotIndex === current;
+        dot.classList.toggle('active', active);
+        dot.setAttribute('aria-current', active ? 'true' : 'false');
+      });
+      if (status) {
+        const parts = status.textContent?.split(' ') ?? [];
+        status.textContent = `${parts[0]} ${current + 1} ${parts.slice(2).join(' ')}`;
+      }
+    };
+
+    previous?.addEventListener('click', () => show(current - 1));
+    next?.addEventListener('click', () => show(current + 1));
+    dots.forEach((dot, index) => dot.addEventListener('click', () => show(index)));
+  });
+</script>
+
+<style>
+  .carousel {
+    margin-block: 1.25rem;
+  }
+
+  .frame {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.75rem;
+    background: var(--sl-color-black);
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 220ms ease;
+  }
+
+  .slide.active {
+    opacity: 1;
+  }
+
+  .controls,
+  .dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .controls {
+    margin-top: 0.75rem;
+  }
+
+  .controls p {
+    min-width: 6rem;
+    margin: 0;
+    text-align: center;
+    color: var(--sl-color-gray-3);
+    font-size: 0.9rem;
+  }
+
+  .arrow,
+  .dot {
+    border: 1px solid var(--sl-color-gray-5);
+    background: var(--sl-color-gray-6);
+    color: var(--sl-color-white);
+    cursor: pointer;
+  }
+
+  .arrow {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    font-size: 1.2rem;
+  }
+
+  .dots {
+    margin-top: 0.75rem;
+  }
+
+  .dot {
+    width: 0.6rem;
+    height: 0.6rem;
+    padding: 0;
+    border-radius: 999px;
+  }
+
+  .arrow:hover,
+  .arrow:focus-visible,
+  .dot.active,
+  .dot:focus-visible {
+    border-color: var(--sl-color-accent-high);
+    background: var(--sl-color-accent-high);
+  }
+</style>

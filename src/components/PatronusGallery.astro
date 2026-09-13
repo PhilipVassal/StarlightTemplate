@@ -1,0 +1,60 @@
+---
+/** Static image gallery showing 3D models from the Patronus project. */
+import mount from '../assets/patronus/patronus-mount.png';
+import overview from '../assets/patronus/patronus-overview.png';
+import detail from '../assets/patronus/patronus-detail.png';
+
+interface Props {
+  locale?: 'nb' | 'en';
+}
+
+const { locale = 'nb' } = Astro.props;
+const captions = locale === 'en'
+  ? [
+      'Overview of the 3D model from the Patronus project',
+      'Sensor module in the Patronus model',
+      'Defeat module in the Patronus model',
+    ]
+  : [
+      'Oversikt over 3D-modell fra Patronus-prosjektet',
+      'Sensormodul i Patronus-modellen',
+      'Defeat-modul i Patronus-modellen',
+    ];
+const images = [overview, mount, detail];
+---
+
+<div class="gallery">
+  {images.map((image, index) => (
+    <figure>
+      <img src={image.src} alt={captions[index]} loading="lazy" />
+      <figcaption>{captions[index]}</figcaption>
+    </figure>
+  ))}
+</div>
+
+<style>
+  .gallery {
+    display: grid;
+    gap: 1rem;
+    margin-block: 1.25rem;
+  }
+
+  figure {
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.75rem;
+    background: var(--sl-color-black);
+  }
+
+  img {
+    display: block;
+    width: 100%;
+  }
+
+  figcaption {
+    padding: 0.65rem 0.85rem;
+    color: var(--sl-color-gray-3);
+    font-size: 0.9rem;
+  }
+</style>
