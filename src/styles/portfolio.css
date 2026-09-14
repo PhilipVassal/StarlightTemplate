@@ -18,7 +18,7 @@
 }
 
 /* Forsiden har sin egen store tittel i .portfolio-intro. */
-body:has(.portfolio-home) .content-panel > h1:first-child {
+body:has(.portfolio-home) main > .content-panel:first-child {
   display: none;
 }
 
