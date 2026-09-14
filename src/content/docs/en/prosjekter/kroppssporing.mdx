@@ -1,0 +1,30 @@
+---
+title: Body tracking system
+description: A project using body tracking and safe decision logic.
+---
+
+import BodyTrackingDemo from '../../../../components/BodyTrackingDemo.astro';
+
+## About the project
+
+This project uses body tracking to identify a person in the camera frame. The program checks whether the face is visible, the hands are lowered and the torso is within the frame.
+
+The Python program uses OpenCV and MediaPipe to track a person with a camera.
+
+## What the code does
+
+The code first finds an available camera and reads the video continuously. MediaPipe is used to find the body's joints. The program draws a skeleton on the image, creates markings for the torso, arms and legs, and shows a point in the centre of the image.
+
+It finds the centre of the body and compares it with the centre of the image. This is shown with an arrow. It also checks whether the face is turned towards the camera and whether the hands are raised.
+
+When the point in the centre is within one of the marked body areas and the safety checks pass, the program registers an event, counts a point and starts a cooldown before the next registration.
+
+This was an early project at the start of the Patronus project. The program sent direction signals to an Arduino, which used the body's position in the image to move motors. When the body was to the right, left, above or below the centre, the program sent a signal in that direction.
+
+## Try body tracking
+
+The demonstration below opens the camera only after you press the button. It draws body landmarks over the video in the browser. It does not use Arduino or hardware.
+
+<BodyTrackingDemo locale="en" />
+
+[Back to home →](/en/)

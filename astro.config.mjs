@@ -17,6 +17,7 @@ export default defineConfig({
         { label: 'Forside', link: '/', translations: { en: 'Home' } },
         { label: 'Prosjekter', translations: { en: 'Projects' }, items: [
           { label: 'Helix NMBU', link: '/prosjekter/prosjekt-02/' },
+          { label: 'Kroppssporing', link: '/prosjekter/kroppssporing/', translations: { en: 'Body tracking' } },
           { label: 'Patronus', link: '/prosjekter/prosjekt-01/' },
         ] },
         { label: 'Om meg og CV', link: '/om-meg/', translations: { en: 'About me & CV' } },

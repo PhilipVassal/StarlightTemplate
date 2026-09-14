@@ -1,0 +1,30 @@
+---
+title: Kroppssporing med siktesystem
+description: Et prosjekt med kroppssporing og sikker beslutningslogikk.
+---
+
+import BodyTrackingDemo from '../../../components/BodyTrackingDemo.astro';
+
+## Om prosjektet
+
+Dette prosjektet bruker kroppssporing for å finne en person i kamerabildet. Programmet sjekker om ansiktet er synlig, om hendene er nede og om overkroppen er innenfor bildet.
+
+Python-programmet bruker OpenCV og MediaPipe til å spore en person med kamera.
+
+## Hva koden gjør
+
+Koden finner først et tilgjengelig kamera og leser videobildet fortløpende. MediaPipe brukes til å finne kroppens ledd. Programmet tegner skjelettet på bildet, lager markeringer for overkropp, armer og bein, og viser et punkt i midten av bildet.
+
+Programmet finner midten av kroppen og sammenligner den med midten av bildet. Dette vises med en pil. Det sjekker også om ansiktet vender mot kameraet og om hendene er oppe.
+
+Når punktet i midten treffer en av de markerte kroppsflatene og sikkerhetssjekkene er godkjent, registrerer programmet en hendelse, teller poeng og starter en nedtelling før neste registrering.
+
+Dette var et startprosjekt i begynnelsen av Patronus-prosjektet. Programmet sendte retningssignaler til en Arduino, som brukte informasjonen om kroppens plassering i bildet til å bevege motorene. Når kroppen var til høyre, venstre, over eller under midten, sendte programmet et signal i den retningen.
+
+## Test kroppssporingen
+
+Demonstrasjonen under åpner kameraet først når du selv trykker på knappen. Den tegner kroppsmarkører over videobildet i nettleseren. Den bruker ikke Arduino eller maskinvare.
+
+<BodyTrackingDemo />
+
+[Tilbake til forsiden →](/)

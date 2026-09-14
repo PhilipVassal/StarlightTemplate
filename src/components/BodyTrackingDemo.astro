@@ -1,0 +1,205 @@
+---
+interface Props {
+  locale?: 'no' | 'en';
+}
+
+const { locale = 'no' } = Astro.props;
+const copy = locale === 'en'
+  ? {
+      start: 'Start camera',
+      stop: 'Stop camera',
+      ready: 'Camera ready. Press “Start camera” to begin.',
+      loading: 'Starting body tracking …',
+      active: 'Body tracking is active.',
+      handsUp: 'Do not fire — hands are up.',
+      stopped: 'Camera stopped.',
+      unsupported: 'Your browser does not support camera access.',
+      denied: 'Camera access was not granted.',
+      directionWaiting: 'Direction: waiting for a person',
+      directionCentered: 'Direction: centred',
+      directionRight: 'Direction: right',
+      directionLeft: 'Direction: left',
+      directionUp: 'Direction: up',
+      directionDown: 'Direction: down',
+      hint: 'The video stays in your browser and is not saved or uploaded.',
+    }
+  : {
+      start: 'Start kamera',
+      stop: 'Stopp kamera',
+      ready: 'Kameraet er klart. Trykk «Start kamera» for å begynne.',
+      loading: 'Starter kroppssporing …',
+      active: 'Kroppssporing er aktiv.',
+      handsUp: 'Skal ikke skyte – hendene er oppe.',
+      stopped: 'Kameraet er stoppet.',
+      unsupported: 'Nettleseren støtter ikke kameratilgang.',
+      denied: 'Kameratilgang ble ikke godkjent.',
+      directionWaiting: 'Retning: venter på en person',
+      directionCentered: 'Retning: sentrert',
+      directionRight: 'Retning: høyre',
+      directionLeft: 'Retning: venstre',
+      directionUp: 'Retning: opp',
+      directionDown: 'Retning: ned',
+      hint: 'Videoen blir bare brukt i nettleseren din og blir ikke lagret eller lastet opp.',
+    };
+---
+
+<section class="tracking-demo" aria-label="Kroppssporing med kamera">
+  <div class="camera-frame">
+    <video data-video playsinline muted></video>
+    <canvas data-canvas aria-hidden="true"></canvas>
+    <p class="camera-placeholder" data-placeholder>Kameravisning</p>
+  </div>
+
+  <div class="tracking-controls">
+    <button type="button" data-start>{copy.start}</button>
+    <button type="button" class="secondary" data-stop disabled>{copy.stop}</button>
+    <output data-status>{copy.ready}</output>
+    <output data-direction>{copy.directionWaiting}</output>
+    <p class="hint">{copy.hint}</p>
+  </div>
+</section>
+
+<script is:inline type="module" define:vars={{ copy }}>
+  import { DrawingUtils, FilesetResolver, PoseLandmarker } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+
+  const demo = document.querySelector('.tracking-demo');
+  const video = demo.querySelector('[data-video]');
+  const canvas = demo.querySelector('[data-canvas]');
+  const context = canvas.getContext('2d');
+  const startButton = demo.querySelector('[data-start]');
+  const stopButton = demo.querySelector('[data-stop]');
+  const status = demo.querySelector('[data-status]');
+  const direction = demo.querySelector('[data-direction]');
+  const placeholder = demo.querySelector('[data-placeholder]');
+  let poseLandmarker;
+  let stream;
+  let animationFrame;
+  let lastVideoTime = -1;
+
+  async function loadPoseLandmarker() {
+    if (poseLandmarker) return poseLandmarker;
+    const vision = await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
+    poseLandmarker = await PoseLandmarker.createFromOptions(vision, {
+      baseOptions: {
+        modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task',
+        delegate: 'GPU',
+      },
+      runningMode: 'VIDEO',
+      numPoses: 1,
+    });
+    return poseLandmarker;
+  }
+
+  function drawFrame() {
+    if (!stream || video.paused) return;
+    if (video.currentTime !== lastVideoTime) {
+      lastVideoTime = video.currentTime;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      const result = poseLandmarker.detectForVideo(video, performance.now());
+      const drawing = new DrawingUtils(context);
+      if (result.landmarks.length === 0) direction.textContent = copy.directionWaiting;
+      for (const landmarks of result.landmarks) {
+        drawing.drawConnectors(landmarks, PoseLandmarker.POSE_CONNECTIONS, { color: '#6ee7b7', lineWidth: 4 });
+        drawing.drawLandmarks(landmarks, { color: '#f8d66d', radius: 4 });
+        const position = drawDirectionArrow(landmarks);
+        direction.textContent = position;
+        const handsUp = landmarks[15].y < landmarks[11].y && landmarks[16].y < landmarks[12].y;
+        status.textContent = handsUp ? copy.handsUp : copy.active;
+        status.dataset.paused = String(handsUp);
+      }
+    }
+    animationFrame = requestAnimationFrame(drawFrame);
+  }
+
+  function drawDirectionArrow(landmarks) {
+    const bodyPoints = [11, 12, 23, 24].map((index) => landmarks[index]);
+    const bodyX = bodyPoints.reduce((sum, point) => sum + point.x, 0) / bodyPoints.length * canvas.width;
+    const bodyY = bodyPoints.reduce((sum, point) => sum + point.y, 0) / bodyPoints.length * canvas.height;
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const angle = Math.atan2(centerY - bodyY, centerX - bodyX);
+
+    context.strokeStyle = '#7dd3fc';
+    context.fillStyle = '#7dd3fc';
+    context.lineWidth = 4;
+    context.beginPath();
+    context.moveTo(bodyX, bodyY);
+    context.lineTo(centerX, centerY);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(centerX, centerY);
+    context.lineTo(centerX - 14 * Math.cos(angle - Math.PI / 6), centerY - 14 * Math.sin(angle - Math.PI / 6));
+    context.lineTo(centerX - 14 * Math.cos(angle + Math.PI / 6), centerY - 14 * Math.sin(angle + Math.PI / 6));
+    context.closePath();
+    context.fill();
+    context.beginPath();
+    context.arc(centerX, centerY, 6, 0, Math.PI * 2);
+    context.fill();
+
+    const offsetX = bodyX - centerX;
+    const offsetY = bodyY - centerY;
+    const threshold = Math.min(canvas.width, canvas.height) * 0.1;
+    if (Math.abs(offsetX) < threshold && Math.abs(offsetY) < threshold) return copy.directionCentered;
+    if (Math.abs(offsetX) > Math.abs(offsetY)) return offsetX < 0 ? copy.directionRight : copy.directionLeft;
+    return offsetY < 0 ? copy.directionUp : copy.directionDown;
+  }
+
+  async function startCamera() {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      status.textContent = copy.unsupported;
+      return;
+    }
+    try {
+      status.textContent = copy.loading;
+      startButton.disabled = true;
+      await loadPoseLandmarker();
+      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      video.srcObject = stream;
+      await video.play();
+      placeholder.hidden = true;
+      stopButton.disabled = false;
+      status.textContent = copy.active;
+      status.dataset.paused = 'false';
+      drawFrame();
+    } catch {
+      status.textContent = copy.denied;
+      startButton.disabled = false;
+    }
+  }
+
+  function stopCamera() {
+    cancelAnimationFrame(animationFrame);
+    stream?.getTracks().forEach((track) => track.stop());
+    stream = undefined;
+    video.srcObject = null;
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    placeholder.hidden = false;
+    startButton.disabled = false;
+    stopButton.disabled = true;
+    status.textContent = copy.stopped;
+    status.dataset.paused = 'false';
+    direction.textContent = copy.directionWaiting;
+  }
+
+  startButton.addEventListener('click', startCamera);
+  stopButton.addEventListener('click', stopCamera);
+  window.addEventListener('pagehide', stopCamera);
+</script>
+
+<style>
+  .tracking-demo { margin-block: 1.5rem; }
+  .camera-frame { position: relative; overflow: hidden; aspect-ratio: 4 / 3; border: 1px solid var(--sl-color-gray-5); border-radius: 0.75rem; background: #101823; }
+  video, canvas { position: absolute; width: 100%; height: 100%; object-fit: cover; }
+  video, canvas { transform: scaleX(-1); }
+  canvas { pointer-events: none; }
+  .camera-placeholder { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; color: var(--sl-color-gray-3); }
+  .tracking-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-top: 1rem; }
+  button { padding: 0.55rem 0.85rem; border: 1px solid var(--sl-color-accent); border-radius: 0.35rem; background: var(--sl-color-accent); color: var(--sl-color-black); font: inherit; font-weight: 700; cursor: pointer; }
+  button.secondary { background: transparent; color: var(--sl-color-accent-high); }
+  button:disabled { cursor: default; opacity: 0.55; }
+  output { color: #9ee6ca; }
+  output[data-paused='true'] { color: #f8d66d; }
+  .hint { flex-basis: 100%; margin: 0; color: var(--sl-color-gray-3); font-size: 0.9rem; }
+</style>
