@@ -59,11 +59,11 @@ Hjelpelærer i Industriell innovasjon og teknologi. Veiledet studenter i produkt
 
 ## Verktøy
 
-- Fusion 360, Inventor og SolidWorks
-- Bambu Studio og Onshape
-- Arduino IDE og VS Code
-- Creality Print, LightBurn og LOGO! Software
-- GitHub
+- **CAD og konstruksjon:** Fusion 360, Inventor, SolidWorks og Onshape
+- **3D-printing:** Bambu Studio og Creality Print
+- **Laserkutting:** LightBurn
+- **Programmering og elektronikk:** Arduino IDE og LOGO! Software
+- **Utvikling:** VS Code og GitHub
 
 ## Kontakt
 

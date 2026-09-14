@@ -59,11 +59,11 @@ Teaching assistant in Industrial Innovation and Technology. Guided students in p
 
 ## Tools
 
-- Fusion 360, Inventor and SolidWorks
-- Bambu Studio and Onshape
-- Arduino IDE and VS Code
-- Creality Print, LightBurn and LOGO! Software
-- GitHub
+- **CAD and design:** Fusion 360, Inventor, SolidWorks and Onshape
+- **3D printing:** Bambu Studio and Creality Print
+- **Laser cutting:** LightBurn
+- **Programming and electronics:** Arduino IDE and LOGO! Software
+- **Development:** VS Code and GitHub
 
 ## Contact
 
